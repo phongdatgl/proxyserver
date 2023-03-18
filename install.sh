@@ -100,8 +100,8 @@ gen_ifconfig() {
 $(awk -F "/" '{print "ifconfig '$main_interface' inet6 add " $5 "/'$SUBNETMASK'"}' ${WORKDATA})
 EOF
 }
-echo "install gcc net-tools bsdtar zip make"
-yum -y install gcc net-tools bsdtar zip make
+echo "install wget iptables gcc net-tools bsdtar zip make"
+yum -y install wget iptables gcc net-tools bsdtar zip make
 
 install_3proxy
 
