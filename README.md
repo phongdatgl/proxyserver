@@ -1,0 +1,1 @@
+`bash <(curl -s "https://raw.githubusercontent.com/thuongtin/ipv4-ipv6-proxy/master/scripts/vultrcentos8.sh")`
