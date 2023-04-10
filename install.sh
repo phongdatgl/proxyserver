@@ -103,13 +103,6 @@ EOF
 echo "install wget iptables gcc net-tools libarchive bsdtar zip make"
 yum -y install wget iptables gcc net-tools libarchive bsdtar zip make
 
-install_3proxy
-
-echo "working folder = /home/proxy-installer"
-WORKDIR="/home/proxy-installer"
-WORKDATA="${WORKDIR}/data.txt"
-PROXYDIR="${WORKDIR}/proxy.txt"
-mkdir $WORKDIR && cd $_
 
 IP4=$(curl -4 -s icanhazip.com)#!/bin/sh
 random() {
@@ -238,7 +231,7 @@ read SUBNETMASK
 echo "Enter external ipv6 (None if ip6): "
 read EXTERNAL
 
-if [[ EXTERNAL -eq '' ]]
+if [[ EXTERNAL -eq "" ]]
 then
     EXTERNAL_IP=$IP6
 else
