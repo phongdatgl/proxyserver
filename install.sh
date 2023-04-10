@@ -80,12 +80,12 @@ EOF
 
 gen_data() {
     seq $FIRST_PORT $LAST_PORT | while read port; do
-        if [[ "$USERN" == "" ]]; then
+        if [[ "$USERN" != "" ]]; then
             puser=$USERN
         else
             puser=$(random)
         fi
-        if [[ "$PASSW" == "" ]]; then
+        if [[ "$PASSW" != "" ]]; then
             ppass=$PASSW
         else
             ppass=$(random)
