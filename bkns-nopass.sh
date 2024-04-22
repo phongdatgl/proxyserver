@@ -1,5 +1,7 @@
 #!/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# curl -sO https://raw.githubusercontent.com/quanglinh0208/3proxy/main/ipv6.sh && bash ipv6.sh
+
 
 random() {
 	tr </dev/urandom -dc A-Za-z0-9 | head -c5
@@ -73,6 +75,9 @@ gen_ifconfig() {
 $(awk -F "/" '{print "ifconfig eth0 inet6 add " $5 "/64"}' ${WORKDATA})
 EOF
 }
+echo "Setup IPv6"
+curl -sO https://raw.githubusercontent.com/quanglinh0208/3proxy/main/ipv6.sh
+bash ipv6.sh
 echo "installing apps"
 yum -y install gcc net-tools bsdtar zip >/dev/null
 
