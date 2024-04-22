@@ -48,7 +48,28 @@ install_3proxy() {
 }
 
 gen_3proxy() {
-    cat <<EOF
+    if [[ "$IS_AUTH" == "n" ]]; then
+        cat <<EOF
+daemon
+maxconn 2000
+nserver 1.1.1.1
+nserver 8.8.4.4
+nserver 2001:4860:4860::8888
+nserver 2001:4860:4860::8844
+nscache 65536
+timeouts 1 5 30 60 180 1800 15 60
+setgid 65535
+setuid 65535
+stacksize 6291456 
+flush
+auth strong
+
+$(awk -F "/" '{print "auth none\n" \
+"proxy -6 -n -a -p" $4 " -i" $3 " -e"$5"\n" \
+"flush\n"}' ${WORKDATA})
+EOF
+    else
+        cat <<EOF
 daemon
 maxconn 2000
 nserver 1.1.1.1
@@ -70,12 +91,19 @@ $(awk -F "/" '{print "auth strong\n" \
 "proxy -6 -n -a -p" $4 " -i" $3 " -e"$5"\n" \
 "flush\n"}' ${WORKDATA})
 EOF
+    fi
 }
 
 gen_proxy_file_for_user() {
-    cat >$PROXYDIR <<EOF
+    if [[ "$IS_AUTH" == "n" ]]; then
+        cat >$PROXYDIR <<EOF
+$(awk -F "/" '{print $3 ":" $4 }' ${WORKDATA})
+EOF
+    else
+        cat >$PROXYDIR <<EOF
 $(awk -F "/" '{print $3 ":" $4 ":" $1 ":" $2 }' ${WORKDATA})
 EOF
+    fi
 }
 
 gen_data() {
@@ -92,9 +120,18 @@ gen_data() {
         fi
         if [[ $SUBNETMASK -eq 64 ]]
         then
-            echo "$puser/$ppass/$IP4/$port/$(gen64 $EXTERNAL_IP)"
+            if [[ "$IS_AUTH" == "n" ]]; then
+                echo "//$IP4/$port/$(gen64 $EXTERNAL_IP)"
+            else
+                echo "$puser/$ppass/$IP4/$port/$(gen64 $EXTERNAL_IP)"
+            fi
         else
-            echo "$puser/$ppass/$IP4/$port/$(gen16 $EXTERNAL_IP)"
+            if [[ "$IS_AUTH" == "n" ]]; then
+                echo "//$IP4/$port/$(gen16 $EXTERNAL_IP)"
+            else
+                echo "$puser/$ppass/$IP4/$port/$(gen16 $EXTERNAL_IP)"
+            fi
+
         fi        
     done
 }
@@ -135,11 +172,19 @@ read SUBNETMASK
 echo "Enter external ipv6 (None if ip6): "
 read EXTERNAL
 
-echo "Enter Proxy Username (None = random): "
-read USERN
+echo "Auth with User/Pass ? (Y/n): "
+read IS_AUTH
 
-echo "Enter Proxy Password (None = random): "
-read PASSW
+USERN=""
+PASSW=""
+if [[ "$IS_AUTH" != "n" ]]
+then
+    echo "Enter Proxy Username (None = random): "
+    read USERN
+
+    echo "Enter Proxy Password (None = random): "
+    read PASSW
+fi
 
 echo "Install Proxy."
 
